@@ -59,7 +59,55 @@ export const SearchChannelsInputSchema = z.object({
     .describe("Maximum number of channels to return (1-10, default: 5)")
 }).strict();
 
+// --- Agent Architecture Schemas ---
+
+export const ConfigureUserInputSchema = z.object({
+  industry: z.string().optional().describe("Your industry (e.g., 'SaaS', 'E-commerce', 'Fintech')"),
+  competitors: z.array(z.string()).optional().describe("List of competitor names to track"),
+  keywords: z.array(z.string()).optional().describe("Keywords to monitor (e.g., 'best CRM', 'project management tool')"),
+  tracked_channels: z.array(z.string()).optional().describe("YouTube channel IDs (UC...) to monitor"),
+  notes: z.array(z.string()).optional().describe("Additional context about your business"),
+}).strict();
+
+export const RunAgentInputSchema = z.object({
+  agent_id: z.enum(["competitor-monitor", "sentiment-analyst", "trend-spotter", "lead-qualifier"])
+    .describe("Which agent to run"),
+  params: z.record(z.unknown()).optional().describe("Agent-specific parameters (channelIds, keywords, videoIds)"),
+}).strict();
+
+export const RunAllAgentsInputSchema = z.object({}).strict();
+
+export const GetInsightsInputSchema = z.object({
+  agent_id: z.enum(["competitor-monitor", "sentiment-analyst", "trend-spotter", "lead-qualifier"]).optional()
+    .describe("Filter by agent"),
+  type: z.enum(["buying_signal", "competitor_move", "sentiment", "trend"]).optional()
+    .describe("Filter by insight type"),
+  limit: z.number().int().min(1).max(100).default(20).describe("Max insights to return"),
+}).strict();
+
+export const HeartbeatInputSchema = z.object({
+  action: z.enum(["start", "stop", "status"]).describe("Start, stop, or check heartbeat status"),
+  interval_minutes: z.number().int().min(5).max(120).default(30)
+    .describe("How often to run all agents (minutes, default 30)"),
+}).strict();
+
+export const AddMonitorInputSchema = z.object({
+  type: z.enum(["channel", "keyword"]).describe("What to monitor"),
+  value: z.string().min(1).describe("Channel ID or keyword to monitor"),
+}).strict();
+
+export const GetMemoryInputSchema = z.object({}).strict();
+
+// --- Type Exports ---
+
 export type SearchVideosInput = z.infer<typeof SearchVideosInputSchema>;
 export type GetCommentsInput = z.infer<typeof GetCommentsInputSchema>;
 export type GetChannelVideosInput = z.infer<typeof GetChannelVideosInputSchema>;
 export type SearchChannelsInput = z.infer<typeof SearchChannelsInputSchema>;
+export type ConfigureUserInput = z.infer<typeof ConfigureUserInputSchema>;
+export type RunAgentInput = z.infer<typeof RunAgentInputSchema>;
+export type RunAllAgentsInput = z.infer<typeof RunAllAgentsInputSchema>;
+export type GetInsightsInput = z.infer<typeof GetInsightsInputSchema>;
+export type HeartbeatInput = z.infer<typeof HeartbeatInputSchema>;
+export type AddMonitorInput = z.infer<typeof AddMonitorInputSchema>;
+export type GetMemoryInput = z.infer<typeof GetMemoryInputSchema>;
